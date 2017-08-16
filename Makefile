@@ -1,22 +1,14 @@
-CXX = gcc
-CXXFLAGS =  -Wall -g #-DTEST
-EXEC = main.x
-OBJECTS = main.o graph.o display.o
+CC = gcc
+CFLAGS =  -Wall -g -MMD
+LDLIBS = -l SDL2
+EXEC = main
+OBJECTS = ${EXEC}.o graph.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 
 ${EXEC}: ${OBJECTS}
-	${CXX} ${CXXFLAGS} ${OBJECTS} -o ${EXEC} -l SDL2
 
-main.o: main.c graph.h
-	${CXX} ${CXXFLAGS} -c main.c
-
-graph.o: graph.c graph.h
-	${CXX} ${CXXFLAGS} -c graph.c
-
-display.o: display.h display.c
-	${CXX} ${CXXFLAGS} -c display.c
-
+-include ${DEPENDS}
 
 clean:
 	rm -f ${OBJECTS} ${EXEC} ${DEPENDS}

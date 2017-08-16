@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "display.h"
 #include <SDL2/SDL.h>
 
 int main(int argc, char *argv[]) {
@@ -63,21 +62,42 @@ int main(int argc, char *argv[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         printf("failed to init SDL");
     }
+    
+    //init vars
+    int win_w = 1024;
+    int win_h = 840;
+    //int x_offset = 0;
+    //int y_offset = 0;
 
-    Display *main_win = createDisplay(1024, 840);
-    wipeDisplay(main_win);
+    //init SDL vars
+    SDL_Window *main_win = SDL_CreateWindow("Graph Visualizer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,win_w,win_h,0);
+    SDL_Renderer *main_rend = SDL_CreateRenderer(main_win,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Texture *win_tx = SDL_GetRenderTarget(main_rend);
+    SDL_Texture *bg_tx = SDL_CreateTexture(main_rend,SDL_PIXELFORMAT_RGB24,SDL_TEXTUREACCESS_TARGET,win_w,win_h);
+    
+    //SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(main_rend);
+    SDL_RenderPresent(main_rend);
 
+    
+    //draw bg texture
+    SDL_SetRenderTarget(main_rend, bg_tx);
+    SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(main_rend);
+    SDL_SetRenderDrawColor(main_rend,0x70,0x70,0x70,SDL_ALPHA_OPAQUE);
+    for(int i = 0; i < win_w; i += 100) {
+        SDL_RenderDrawLine(main_rend,i,0,i,win_h);
+    }
+    for(int i = 0; i < win_h; i += 100) {
+        SDL_RenderDrawLine(main_rend,0,i,win_w,i);
+    }
+    SDL_RenderPresent(main_rend);
+    SDL_SetRenderTarget(main_rend, NULL);
+    
     int quit = 1;
     //Uint32 start = SDL_GetTicks();
-
     //main app loop
     while (quit) {
-        /*if (SDL_TICKS_PASSED(SDL_GetTicks(), start + 50)) {
-            start = SDL_GetTicks();
-        } else {
-            SDL_Delay
-        }*/
-
         SDL_Event e;
 
         while (SDL_PollEvent(&e)) {
@@ -93,13 +113,19 @@ int main(int argc, char *argv[]) {
         
         //update logic here
         
-        //draw
-        wipeDisplay(main_win);
-        drawSquare(main_win,100,100,30);
-        updateDisplay(main_win);
+        //DRAW
+        
+        //draw bg
+        SDL_RenderCopy(main_rend,bg_tx,NULL,NULL);
+
+
+        SDL_RenderPresent(main_rend);
     }
 
-    destroyDisplay(main_win);
+    SDL_DestroyTexture(win_tx);
+    SDL_DestroyTexture(bg_tx);
+    SDL_DestroyRenderer(main_rend);
+    SDL_DestroyWindow(main_win);
     SDL_Quit();
 
 }
