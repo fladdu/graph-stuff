@@ -47,27 +47,31 @@ int main(int argc, char *argv[]) {
     SDL_RenderPresent(main_rend);
     SDL_SetRenderTarget(main_rend, NULL);
     
-    int quit = 1;
+    int quit = 0;
+    //int 
     //main app loop
-    while (quit) {
+    while (!quit) {
         SDL_Event e;
 
         while (SDL_PollEvent(&e)) {
             //handle events here
-            if (e.type == SDL_QUIT) quit = 0;
-
             switch(e.type) {
                 case SDL_QUIT: 
-                    quit = 0;
+                    quit = 1;
                     break;
                 case SDL_MOUSEMOTION:
-                    offset_x = e.motion.x;
-                    offset_y = e.motion.y;
+                    if (e.motion.state & SDL_BUTTON_LMASK) {
+                        offset_x += e.motion.xrel;
+                        offset_y += e.motion.yrel;
+                    }
                     break;
+                //case SDL_MOUSEBUTTONDOWN
             }
         }
         
-        //update logic here
+        //update logic
+        
+        /*
         if (offset_x < -(bg_size)) {
             offset_x = -bg_size;
         } else if (offset_x > bg_size) {
@@ -78,16 +82,17 @@ int main(int argc, char *argv[]) {
             offset_y = -bg_size;
         } else if (offset_y > bg_size) {
             offset_y = bg_size;
-        }
+        }*/
        
  
-        //DRAWe
+        //BEGIN DRAW-----------------------------------
         SDL_RenderClear(main_rend);
         
-        //draw bg
+        //bg
         drawbg(offset_x,offset_y,res,bg_tx,main_rend,BGTYPE_GRID);
 
         SDL_RenderPresent(main_rend);
+        //END DRAW-------------------------------------
     }
 
     SDL_DestroyTexture(fg_tx);
