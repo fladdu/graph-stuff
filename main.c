@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "draw.h"
+#include "cursor.h"
 #include <SDL2/SDL.h>
 
 
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]) {
     int offset_x = 0;
     int offset_y = 0;
     int bg_size = win_w + win_h;
-    char res = argv[1]?atoi(argv[1]):20;
+    char res = argv[1]?atoi(argv[1]):70; //pixels per grid square
 
     //init SDL vars
     SDL_Window *main_win = SDL_CreateWindow("Graph Visualizer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,win_w,win_h,0);
@@ -28,7 +29,10 @@ int main(int argc, char *argv[]) {
     SDL_Texture *bg_tx = NULL; //= SDL_CreateTexture(main_rend,SDL_PIXELFORMAT_RGB24,SDL_TEXTUREACCESS_TARGET,bg_size,bg_size);
     SDL_Texture *fg_tx = SDL_CreateTexture(main_rend,SDL_PIXELFORMAT_RGB24,SDL_TEXTUREACCESS_TARGET,win_w,win_h);
     
-    //SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
+    //setup SDL stuff
+    SDL_SetTextureBlendMode(fg_tx,SDL_BLENDMODE_BLEND);
+    //SDL_SetRenderDrawBlendMode(main_rend,SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
     SDL_RenderClear(main_rend);
     SDL_RenderPresent(main_rend);
 
@@ -47,49 +51,81 @@ int main(int argc, char *argv[]) {
     SDL_RenderPresent(main_rend);
     SDL_SetRenderTarget(main_rend, NULL);
     
+    //my stuff
     int quit = 0;
-    //int 
+    CursorMode mode = CURSOR_MOVE; 
+    SDL_Rect *rect_arr = NULL;
+    int rectCount = 0;
     //main app loop
     while (!quit) {
         SDL_Event e;
 
         while (SDL_PollEvent(&e)) {
+
+            //for key events
+            SDL_Keycode curr;
+
+            //for locations
+            int x;
+            int y;
+            
             //handle events here
             switch(e.type) {
                 case SDL_QUIT: 
                     quit = 1;
                     break;
                 case SDL_MOUSEMOTION:
-                    if (e.motion.state & SDL_BUTTON_LMASK) {
+                    if (e.motion.state & SDL_BUTTON_LMASK && mode == CURSOR_MOVE) {
                         offset_x += e.motion.xrel;
                         offset_y += e.motion.yrel;
+                        for(int i = 0; i < rectCount; i++) {
+                            moveRect(rect_arr+i,e.motion.xrel,e.motion.yrel);
+                        }
+
                     }
                     break;
-                //case SDL_MOUSEBUTTONDOWN
+                case SDL_KEYDOWN:
+                    curr = e.key.keysym.sym;
+                    if (curr == SDLK_i && mode != CURSOR_ADD) {
+                        puts("Entered insert mode");
+                        mode = CURSOR_ADD;
+                    } else if (curr == SDLK_m && mode !=CURSOR_MOVE) {
+                        puts("Entered move mode");
+                        mode = CURSOR_MOVE;
+                    }
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    x = e.button.x;
+                    y = e.button.y;
+                    if (e.button.button == SDL_BUTTON_LEFT && mode == CURSOR_ADD) {
+                        rect_arr = realloc(rect_arr,++rectCount * sizeof(SDL_Rect));
+                        rect_arr[rectCount-1] = getRect(x, y, 45, 45);
+                    }
             }
         }
         
         //update logic
         
-        /*
-        if (offset_x < -(bg_size)) {
-            offset_x = -bg_size;
-        } else if (offset_x > bg_size) {
-            offset_x = bg_size;
-        }
-
-        if (offset_y < -bg_size) {
-            offset_y = -bg_size;
-        } else if (offset_y > bg_size) {
-            offset_y = bg_size;
-        }*/
-       
  
         //BEGIN DRAW-----------------------------------
+        SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
         SDL_RenderClear(main_rend);
         
         //bg
         drawbg(offset_x,offset_y,res,bg_tx,main_rend,BGTYPE_GRID);
+
+
+        //fg
+        SDL_SetRenderTarget(main_rend, fg_tx);
+        SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_TRANSPARENT);
+        SDL_RenderClear(main_rend);
+        //draw stuff to fg tx
+        SDL_SetRenderDrawColor(main_rend,0x33,0x23,0xff,SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRects(main_rend,rect_arr,rectCount);
+        //------------------
+        SDL_SetRenderTarget(main_rend,NULL);
+
+        SDL_RenderCopy(main_rend,fg_tx,NULL,NULL);
 
         SDL_RenderPresent(main_rend);
         //END DRAW-------------------------------------
@@ -101,5 +137,8 @@ int main(int argc, char *argv[]) {
     SDL_DestroyRenderer(main_rend);
     SDL_DestroyWindow(main_win);
     SDL_Quit();
+
+    //free my stuff
+    free(rect_arr);
 
 }

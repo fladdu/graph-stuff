@@ -26,3 +26,19 @@ void drawbg(int x,int y,int res,SDL_Texture *bg,SDL_Renderer *rend,int type) {
     }
 }
 
+
+
+//helper
+SDL_Rect getRect(int x,int y,int w,int h) {
+    SDL_Rect r;
+    r.x = x;
+    r.y = y;
+    r.w = w;
+    r.h = h;
+    return r;
+}
+
+void moveRect(SDL_Rect *r,int x,int y) {
+    r->x += x;
+    r->y += y;
+}

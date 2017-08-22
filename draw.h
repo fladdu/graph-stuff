@@ -11,4 +11,10 @@ extern const int win_h;
 
 //background
 void drawbg(int x,int y,int res,SDL_Texture *bg,SDL_Renderer *rend,int type);
+
+
+
+//helpers
+SDL_Rect getRect(int x,int y,int w,int h);
+void moveRect(SDL_Rect *r,int x,int y);
 #endif
