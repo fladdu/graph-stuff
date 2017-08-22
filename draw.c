@@ -22,13 +22,13 @@ void drawbg(int x,int y,int res,SDL_Texture *bg,SDL_Renderer *rend,int type) {
                 break;
         }
     } else {
-        //background given
+        //TODO background given
     }
 }
 
 
 
-//helper
+//rect
 SDL_Rect getRect(int x,int y,int w,int h) {
     SDL_Rect r;
     r.x = x;
@@ -41,4 +41,19 @@ SDL_Rect getRect(int x,int y,int w,int h) {
 void moveRect(SDL_Rect *r,int x,int y) {
     r->x += x;
     r->y += y;
+}
+
+//circle
+void renderDrawCircle(SDL_Renderer *rend, int x, int y, int r) {
+    for(int row = 0; row < 2*r; row++) {
+        for(int col = 0; col < 2*r; col++) {
+            int cur_x = (x-r)+col;
+            int cur_y = (y-r)+row;
+            float dist = hypot(cur_x-x,cur_y-y);
+
+            if (dist <= r) {
+                SDL_RenderDrawPoint(rend,cur_x,cur_y);
+            }
+        }
+    }
 }

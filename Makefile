@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS =  -Wall -g -MMD
-LDLIBS = -l SDL2
+LDLIBS = -lm -l SDL2
 EXEC = main
 OBJECTS = ${EXEC}.o graph.o draw.o cursor.o
 DEPENDS = ${OBJECTS:.o=.d}

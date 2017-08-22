@@ -1,6 +1,7 @@
 #ifndef DRAW_H
 #define DRAW_H
 #include <SDL2/SDL.h>
+#include <math.h>
 
 extern const int win_w;
 extern const int win_h;
@@ -14,7 +15,10 @@ void drawbg(int x,int y,int res,SDL_Texture *bg,SDL_Renderer *rend,int type);
 
 
 
-//helpers
+//rect
 SDL_Rect getRect(int x,int y,int w,int h);
 void moveRect(SDL_Rect *r,int x,int y);
+
+//circle
+void renderDrawCircle(SDL_Renderer *rend, int x, int y, int r);
 #endif

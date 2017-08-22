@@ -5,10 +5,13 @@
 #include "draw.h"
 #include "cursor.h"
 #include <SDL2/SDL.h>
+#include <math.h>
 
 
 const int win_w = 1024;
 const int win_h = 840;
+const int MAX_RES = min(win_w,win_h)/3
+const int MIN_RES = 15;
 
 int main(int argc, char *argv[]) {
 
@@ -78,10 +81,6 @@ int main(int argc, char *argv[]) {
                     if (e.motion.state & SDL_BUTTON_LMASK && mode == CURSOR_MOVE) {
                         offset_x += e.motion.xrel;
                         offset_y += e.motion.yrel;
-                        for(int i = 0; i < rectCount; i++) {
-                            moveRect(rect_arr+i,e.motion.xrel,e.motion.yrel);
-                        }
-
                     }
                     break;
                 case SDL_KEYDOWN:
@@ -99,13 +98,19 @@ int main(int argc, char *argv[]) {
                     y = e.button.y;
                     if (e.button.button == SDL_BUTTON_LEFT && mode == CURSOR_ADD) {
                         rect_arr = realloc(rect_arr,++rectCount * sizeof(SDL_Rect));
-                        rect_arr[rectCount-1] = getRect(x, y, 45, 45);
+                        rect_arr[rectCount-1] = getRect(x-offset_x, y-offset_y, 45, 45);
                     }
             }
         }
         
-        //update logic
+        //update logic--------------------------------
         
+        //capping stuff
+        if (res > MAX_RES) {
+            res = MAX_RES;
+        } else if (res < MIN_RES) {
+            res = MIN_RES;
+        }
  
         //BEGIN DRAW-----------------------------------
         SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
@@ -121,7 +126,12 @@ int main(int argc, char *argv[]) {
         SDL_RenderClear(main_rend);
         //draw stuff to fg tx
         SDL_SetRenderDrawColor(main_rend,0x33,0x23,0xff,SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRects(main_rend,rect_arr,rectCount);
+        for(int i = 0; i < rectCount; i++) {
+            SDL_Rect curr = rect_arr[i];
+            SDL_Rect temp = getRect(curr.x + offset_x, curr.y + offset_y, curr.w, curr.h);
+            renderDrawCircle(main_rend,temp.x,temp.y,(temp.w+temp.h)/4);
+        }
+        //SDL_RenderFillRects(main_rend,rect_arr,rectCount);
         //------------------
         SDL_SetRenderTarget(main_rend,NULL);
 
