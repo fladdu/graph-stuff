@@ -10,7 +10,7 @@
 
 const int win_w = 1024;
 const int win_h = 840;
-const int MAX_RES = min(win_w,win_h)/3
+const int MAX_RES = 200;
 const int MIN_RES = 15;
 
 int main(int argc, char *argv[]) {
@@ -23,7 +23,9 @@ int main(int argc, char *argv[]) {
     int offset_x = 0;
     int offset_y = 0;
     int bg_size = win_w + win_h;
-    char res = argv[1]?atoi(argv[1]):70; //pixels per grid square
+    float res = argv[1]?atoi(argv[1]):70; //pixels per grid square
+    float zoom = 1; //zoom level
+    float sensitivity = .95;
 
     //init SDL vars
     SDL_Window *main_win = SDL_CreateWindow("Graph Visualizer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,win_w,win_h,0);
@@ -71,6 +73,10 @@ int main(int argc, char *argv[]) {
             //for locations
             int x;
             int y;
+
+            //misc
+            int temp_i;
+            float temp_f;
             
             //handle events here
             switch(e.type) {
@@ -100,10 +106,23 @@ int main(int argc, char *argv[]) {
                         rect_arr = realloc(rect_arr,++rectCount * sizeof(SDL_Rect));
                         rect_arr[rectCount-1] = getRect(x-offset_x, y-offset_y, 45, 45);
                     }
+                    break;
+                case SDL_MOUSEWHEEL:
+                    break;
+                    y = e.wheel.y;
+                    temp_f = res;
+                    res *= sqrt(pow(sensitivity,y));//add sensitivity
+                    //offset_x += y * ((temp_f - res)/2);
+                    //offset_y += y * ((temp_f - res)/2);
+                    zoom += y*-(1-sensitivity);
+                    printf("res: %f, zoom: %f\n",res, zoom);
+                    //res = (res/temp_f) * zoom;
+                    break;
             }
         }
         
         //update logic--------------------------------
+    
         
         //capping stuff
         if (res > MAX_RES) {
@@ -111,6 +130,8 @@ int main(int argc, char *argv[]) {
         } else if (res < MIN_RES) {
             res = MIN_RES;
         }
+
+        
  
         //BEGIN DRAW-----------------------------------
         SDL_SetRenderDrawColor(main_rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
@@ -129,7 +150,7 @@ int main(int argc, char *argv[]) {
         for(int i = 0; i < rectCount; i++) {
             SDL_Rect curr = rect_arr[i];
             SDL_Rect temp = getRect(curr.x + offset_x, curr.y + offset_y, curr.w, curr.h);
-            renderDrawCircle(main_rend,temp.x,temp.y,(temp.w+temp.h)/4);
+            renderDrawCircle(main_rend,temp.x,temp.y,((temp.w+temp.h)/4)/**sqrt(zoom)*/);
         }
         //SDL_RenderFillRects(main_rend,rect_arr,rectCount);
         //------------------
