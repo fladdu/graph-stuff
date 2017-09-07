@@ -2,31 +2,34 @@
 #define GUI_H
 
 #include <SDL2/SDL.h>
-#include "app.h"
-#include "data.h"
+#include "types.h"
+#include "GUIelement.h"
 
 /*
     a library for managing gui stuff, not application specific 
 */
 
-typedef struct gui GUI;
-typedef int (*draw_func)(SDL_Renderer *,App *);//for drawing stuff to gui elements
-typedef int (*callback)(App *,Data);//for buttons/other elements (ie. change cursor state) data for ref/amt/val
+/*
+    #ifndef TYPES_H
+    typedef int (*draw_func)(SDL_Renderer *,void *);//for drawing stuff to gui elements
+    typedef int (*callback)(void *,int);//for buttons/other elements (ie. change cursor state) data for ref/amt/val
+    typedef int (*event_handler) (void *, SDL_Event *);//same as SDL_EventFilter more general event handler
+    #endif
+*/
 
-struct gui;
 
 //creation
-GUI *createGUI();
+GUI *createGUI(const char *name, void *app, const SDL_Rect win);
 
 //deletion
 void destroyGUI(GUI *g);
 
 //drawing
-void drawBG(GUI *g);//draws all the bgs for all the secs
-void useDrawFunc(GUI *g, App *a, draw_func df, int sec);//uses df to draw to section sec
+void drawBG(GUI *g, void *app);//draws all the bgs for all the secs
+void useDrawFunc(GUI *g, void *userdata, draw_func df, int sec);//uses df(,userdata) to draw to section sec, kinda overrides everything this library stands for but who cares?
 
 //events
-void handleEvents(GUI *g, App *a);
+void handleEvents(GUI *g, void *app);
 
 /*
 ============================================================
@@ -35,9 +38,7 @@ void handleEvents(GUI *g, App *a);
 */
 
 /*
-    //TODO
-    make general 'GUIelement' union for other things like sliders and stuff
-    so will change this method
+    adds a button named name to g at *hitbox
 
     parameters:
         g: gui to add button to
@@ -45,11 +46,24 @@ void handleEvents(GUI *g, App *a);
         name: name of button (probably will be used for button graphics 
             (ie name_clicked, name_hover, etc))
         val: reference number (idk how useful it will be but whatevs)
-        c: function to be called when button is clicked (is passed current app and val given to addButton)
+        c: function to be called when button is clicked (is passed current app and val)
         
 */
 void addButton(GUI *g, SDL_Rect *hitBox, const char *name, int val, callback c);
 
+
+/*
+    a display is a place you can draw to easy with draw_funcs
+
+    parameters
+        g: gui to add to
+        hitbox: area on gui (relative to window)
+        name: name of element
+        val: ref number
+        format: one of the SDL pixel formats
+*/
+void addDisplay(GUI *g, SDL_Rect *hitbox, const char *name, int val, int format);
+    
 /*
     a section simply defines a region of the ui so it can be maipulated easily
     
