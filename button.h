@@ -4,7 +4,7 @@
 #include "types.h"
 
 typedef struct button {
-    callback c;
+    callback c;//if both c and click (from GUIelement) are defined, c is called before click
 } Button;
 
 
