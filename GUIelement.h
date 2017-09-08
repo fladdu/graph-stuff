@@ -19,8 +19,9 @@ typedef struct guielement {
     int val;
     cosnt char* name;
     event_handler eh; //TODO better name
+    SDL_Rect area;
 
-    SDL_Texture *sprites; //nonchanging (ie moving) texture of element like button depressed or backgroind of slider not for things like the slider head that moves    
+    SDL_Texture *sprites; //nonchanging (ie non-moving) texture of element like button depressed or backgroind of slider not for things like the slider head that moves    
 
     union {
         Button button;
@@ -30,6 +31,12 @@ typedef struct guielement {
 } GUIelement;
 
 
+/*
+===============================
+Destruction
+===============================
+*/
 
+void destroyGUIelement(GUIelement *e);
 
 #endif
