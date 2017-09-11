@@ -7,8 +7,7 @@ typedef struct SDL_Texture SDL_Texture; //forward declaration
 
 typedef struct display {
     SDL_Texture *canvas;
-} Button;
+} Display;
 
 
 #endif
-~      

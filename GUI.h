@@ -9,14 +9,7 @@
     a library for managing gui stuff, not application specific 
 */
 
-/*
-    #ifndef TYPES_H
-    typedef int (*draw_func)(SDL_Renderer *,void *);//for drawing stuff to gui elements
-    typedef int (*callback)(void *,int);//for buttons/other elements (ie. change cursor state) data for ref/amt/val
-    typedef int (*event_handler) (void *, SDL_Event *);//same as SDL_EventFilter more general event handler
-    #endif
-*/
-
+typedef struct gui GUI;
 
 //creation
 GUI *createGUI(const char *name, void *app, const SDL_Rect win);
@@ -25,11 +18,12 @@ GUI *createGUI(const char *name, void *app, const SDL_Rect win);
 void destroyGUI(GUI *g);
 
 //drawing
-void drawBG(GUI *g, void *app);//draws all the bgs for all the secs
-void useDrawFunc(GUI *g, void *userdata, draw_func df, int sec);//uses df(,userdata) to draw to section sec, kinda overrides everything this library stands for but who cares?
+void drawBG(GUI *g);//draws all the bgs for all the secs
+void useDrawFunc(GUI *g, void *userdata, draw_func df, int sec);//uses df(rend,userdata) to draw to section sec, kinda overrides everything this library stands for but who cares?
+void update(GUI *g);
 
 //events
-void handleEvents(GUI *g, void *app);
+int handleEvents(GUI *g);
 
 /*
 ============================================================

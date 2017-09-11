@@ -2,7 +2,8 @@
 #define GUI_ELEMENT_H
 
 #include "types.h"
-#include <SDL2/SDL_Rect.h>
+#include <SDL2/SDL_rect.h>
+#include "GUIevent.h"
 
 #include "button.h"
 #include "display.h"
@@ -22,19 +23,16 @@ typedef enum type {
 typedef struct guielement {
     Type type;
     int val;
-    cosnt char* name;
+    const char* name;
     SDL_Rect area;
 
     //event handlers
         //TODO make structure to simplify event handling
-    event_handler click;
-    event_handler unclick;
-    event_handler mousemove;
-    event_handler unhover;
+    GUIeventHandler* eh;
 
     SDL_Rect clip;
 
-    SDL_Texture *sprites; //nonchanging (ie non-moving) texture of element like button depressed or backgroind of slider not for things like the slider head that moves    
+    SDL_Texture *sprites; 
 
     /*  
         Difference between 'sprites' vs element specific textures

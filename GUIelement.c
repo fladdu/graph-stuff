@@ -23,7 +23,8 @@ void destroyGUIelement(GUIelement *e) {
             SDL_DestroyTexture(e->display.canvas);
             break;
     }
-
+    
+    destroyGUIeventHandler(e->eh);
     SDL_DestroyTexture(e->sprites);
 }
 
@@ -35,39 +36,47 @@ Texture management
 
 void setTexture(GUIelement *e, int val) {
     switch(val) {
-        case DEFAULT_TEXTURE:
-            e->clip = {
+        case DEFAULT_TEXTURE: {
+            SDL_Rect r = {
                         .x = 0,
                         .y = 0,
                         .w = e->area.w,
                         .h = e->area.h
                       };
+            e->clip = r;
             break;
-        case CLICK_TEXTURE:
-            e->clip = {
+        }
+        case CLICK_TEXTURE: {
+            SDL_Rect r = {
                         .x = e->area.w,
                         .y = 0,
                         .w = e->area.w,
                         .h = e->area.h
                       };
+            e->clip = r;
             break;
-       case HOVER_TEXTURE:
-            e->clip = {
+        }
+       case HOVER_TEXTURE: {
+            SDL_Rect r = {
                         .x = 0,
                         .y = e->area.h,
                         .w = e->area.w,
                         .h = e->area.h
                       };
+            e->clip = r;
             break;
-        case OTHER_TEXTURE:
-            e->clip = {
+        }
+        case OTHER_TEXTURE: {
+            SDL_Rect r = {
                         .x = e->area.w,
                         .y = e->area.h,
                         .w = e->area.w,
                         .h = e->area.h
                       };
+            e->clip = r;
             break;
-        case default:
+        }
+        default:
             printf("error, unknown texture number: %d\n",val);
             break;
     }

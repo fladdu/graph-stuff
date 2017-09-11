@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "draw.h"
+#include "GUI.h"
+
 #include "cursor.h"
 #include <SDL2/SDL.h>
 #include <math.h>
@@ -10,15 +12,42 @@
 
 const int win_w = 1024;
 const int win_h = 840;
-const int MAX_RES = 200;
-const int MIN_RES = 15;
+
+typedef struct test {
+    int xo;
+    int yo;
+    int res;
+} Test;
+
+
+int blankBG(SDL_Renderer *r, void *app, void *args) {
+    SDL_SetRenderDrawColor(r,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(r);
+    return 1;
+}
+
 
 int main(int argc, char *argv[]) {
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         printf("failed to init SDL");
     }
+
+    Test app = {0, 0, 100};
+
+    SDL_Rect win = {0,0,win_w,win_h};
+
+    GUI *g = createGUI("test yeee", (void*) &app, win);
     
+    addSection(g,&win,blankBG);
+    
+    while(!handleEvents(g)) {
+        drawBG(g);
+        update(g);
+    }
+    
+    destroyGUI(g); 
+    /* 
     //init vars
     int offset_x = 0;
     int offset_y = 0;
@@ -150,7 +179,6 @@ int main(int argc, char *argv[]) {
         for(int i = 0; i < rectCount; i++) {
             SDL_Rect curr = rect_arr[i];
             SDL_Rect temp = getRect(curr.x + offset_x, curr.y + offset_y, curr.w, curr.h);
-            renderDrawCircle(main_rend,temp.x,temp.y,((temp.w+temp.h)/4)/**sqrt(zoom)*/);
         }
         //SDL_RenderFillRects(main_rend,rect_arr,rectCount);
         //------------------
@@ -166,10 +194,6 @@ int main(int argc, char *argv[]) {
     SDL_DestroyTexture(win_tx);
     SDL_DestroyTexture(bg_tx);
     SDL_DestroyRenderer(main_rend);
-    SDL_DestroyWindow(main_win);
+    SDL_DestroyWindow(main_win);*/
     SDL_Quit();
-
-    //free my stuff
-    free(rect_arr);
-
 }

@@ -1,59 +1,29 @@
 #include "draw.h"
+#include <SDL2/SDL_rect.h>
+
+//TODO this is test struct, DELETE
+typedef struct test {
+    int ox;
+    int oy;
+    int res;
+} Test;
 
 //background
-void drawbg(int x,int y,int res,SDL_Texture *bg,SDL_Renderer *rend,int type) {
+void drawGrid(SDL_Renderer *rend, void *app, void *args) {
+    
+    Test temp = *((Test*) app);
+    SDL_Rect r;
+    
+    SDL_RenderGetViewport(rend, &r);
+    
     SDL_SetRenderDrawColor(rend,0xff,0xff,0xff,SDL_ALPHA_OPAQUE);
     SDL_RenderClear(rend);
-    if (bg == NULL) {
-        switch (type) {
-            case BGTYPE_PLAIN:
-                break;
-            case BGTYPE_GRID:
-                //draw grid
-                SDL_SetRenderDrawColor(rend,0x66,0x66,0x66,SDL_ALPHA_OPAQUE);
-                for(int i = x%res; i < win_w; i+=res) {
-                    SDL_RenderDrawLine(rend,i,0,i,win_h);
-                }
-                for(int i = y%res; i < win_h; i+=res) {
-                    SDL_RenderDrawLine(rend,0,i,win_w,i);
-                }
-                break;
-            default:
-                break;
-        }
-    } else {
-        //TODO background given
+    //draw grid
+    SDL_SetRenderDrawColor(rend,0x66,0x66,0x66,SDL_ALPHA_OPAQUE);
+    for(int i = temp.ox%temp.res; i < r.w; i+=temp.res) {
+        SDL_RenderDrawLine(rend,i,0,i,r.h);
     }
-}
-
-
-
-//rect
-SDL_Rect getRect(int x,int y,int w,int h) {
-    SDL_Rect r;
-    r.x = x;
-    r.y = y;
-    r.w = w;
-    r.h = h;
-    return r;
-}
-
-void moveRect(SDL_Rect *r,int x,int y) {
-    r->x += x;
-    r->y += y;
-}
-
-//circle
-void renderDrawCircle(SDL_Renderer *rend, int x, int y, int r) {
-    for(int row = 0; row < 2*r; row++) {
-        for(int col = 0; col < 2*r; col++) {
-            int cur_x = (x-r)+col;
-            int cur_y = (y-r)+row;
-            float dist = hypot(cur_x-x,cur_y-y);
-
-            if (dist <= r) {
-                SDL_RenderDrawPoint(rend,cur_x,cur_y);
-            }
-        }
+    for(int i = temp.oy%temp.res; i < r.h; i+=temp.res) {
+        SDL_RenderDrawLine(rend,0,i,r.w,i);
     }
 }

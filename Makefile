@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS =  -Wall -g -MMD
 LDLIBS = -lm -l SDL2
 EXEC = main
-OBJECTS = ${EXEC}.o graph.o draw.o cursor.o
+OBJECTS = ${EXEC}.o graph.o draw.o cursor.o GUI.o GUIelement.o GUIevent.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 

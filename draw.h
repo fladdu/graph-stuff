@@ -11,14 +11,5 @@ extern const int win_h;
 #define BGTYPE_GRID 1
 
 //background
-void drawbg(int x,int y,int res,SDL_Texture *bg,SDL_Renderer *rend,int type);
-
-
-
-//rect
-SDL_Rect getRect(int x,int y,int w,int h);
-void moveRect(SDL_Rect *r,int x,int y);
-
-//circle
-void renderDrawCircle(SDL_Renderer *rend, int x, int y, int r);
+void drawGrid(SDL_Renderer *rend,void *app,void *args);
 #endif
